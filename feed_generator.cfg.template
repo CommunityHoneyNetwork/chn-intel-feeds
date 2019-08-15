@@ -1,0 +1,35 @@
+# Name the section as the filename you want written out.
+# tags, days, and itype are required keys in each section, and any of the VALID_FILTERS below may be included
+# VALID_FILTERS = ['indicator', 'itype', 'confidence', 'provider', 'limit', 'application', 'nolog', 'tags', 'days',
+#                 'hours', 'groups', 'reporttime', 'cc', 'asn', 'asn_desc', 'rdata', 'firsttime', 'lasttime',
+#                 'region', 'id']
+
+[stingar_ip_list.txt]
+cif_host = https://cif.host
+cif_token = token
+cif_verify_ssl = False
+itype = ipv4
+tags = honeypot
+limit = 50000
+days = 3
+output_path = ./feeds
+
+[stingar_url_list.txt]
+cif_host = https://cif.host
+cif_token = token
+cif_verify_ssl = False
+itype = url
+tags = honeypot
+limit = 50000
+days = 3
+output_path = ./feeds
+
+[stingar_sha256_list.txt]
+cif_host = https://cif.host
+cif_token = token
+cif_verify_ssl = False
+itype = sha256
+tags = honeypot
+limit = 50000
+days = 3
+output_path = ./feeds

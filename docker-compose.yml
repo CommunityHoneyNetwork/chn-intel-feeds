@@ -1,0 +1,12 @@
+version: '2'
+services:
+  chn-intel-feeds:
+    build:
+      context: .
+    image: chn-intel-feeds:ubuntu
+    volumes:
+      - ./feed_generator.cfg:/opt/feed_generator.cfg
+    ports:
+      - 9000:9000
+    env_file:
+      - chn-intel-feeds.env

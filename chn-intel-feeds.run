@@ -1,0 +1,18 @@
+#!/bin/bash
+
+trap "exit 130" SIGINT
+trap "exit 137" SIGKILL
+trap "exit 143" SIGTERM
+
+if [[ ${DEBUG} == "true" ]]
+then
+  set -o xtrace
+  DBG="-d"
+fi
+
+mkdir -p /var/www/feeds
+cd /var/www/feeds
+python3 -m http.server ${PORT:-9000} &
+
+cd /var/www
+exec python3 /opt/feed_generator.py -C /opt/feed_generator.cfg -s ${SLEEP:-60} -r ${DBG}
