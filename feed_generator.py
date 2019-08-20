@@ -4,13 +4,14 @@ import os
 import sys
 import argparse
 import time
-import configparser
 from cifsdk.client.http import HTTP as Client
 
-LOG_FORMAT = '%(asctime)s - %(levelname)s - %(message)s'
+LOG_FORMAT = '%(asctime)s - %(levelname)s - %(name)s[%(lineno)s][%(threadName)s] - %(message)s'
 VALID_FILTERS = ['indicator', 'itype', 'confidence', 'provider', 'limit', 'application', 'nolog', 'tags', 'days',
                  'hours', 'groups', 'reporttime', 'cc', 'asn', 'asn_desc', 'rdata', 'firsttime', 'lasttime', 'region',
                  'id']
+FEED_LIMIT = 30
+
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter(LOG_FORMAT))
 logger = logging.getLogger(__name__)
@@ -19,11 +20,12 @@ logger.addHandler(handler)
 
 
 class CIFFeed(object):
-    def __init__(self, remote, token, ouput_path='./', verify=False):
+    def __init__(self, remote, token, output_path='./', verify=False):
         self.remote = remote
         self.token = token
-        self.output_path = ouput_path
+        self.output_path = output_path
         self.verify = verify
+        self.filename = None
         self.filters = {}
 
     def __repr__(self):
@@ -32,8 +34,8 @@ class CIFFeed(object):
     def add_filters(self, items):
         filter = {}
         for item, value in items:
-            if item in VALID_FILTERS:
-                filter[item] = value
+            if item.lower() in VALID_FILTERS:
+                filter[item.lower()] = value
         self.filters = filter
 
     def get_feed(self):
@@ -42,6 +44,7 @@ class CIFFeed(object):
                      verify_ssl=self.verify)
         logger.debug('Getting feed with filters: {}'.format(self.filters))
         try:
+            logger.debug('Getting feed with filter set: {}'.format(self.filters))
             f = cli.feed(filters=self.filters)
             return f
         except Exception as e:
@@ -49,35 +52,70 @@ class CIFFeed(object):
             sys.exit(1)
 
 
-def parse_section(s):
-    cif_token = s.get('cif_token')
-    cif_host = s.get('cif_host')
-    cif_verify_ssl = s.getboolean('cif_verify_ssl', fallback=False)
-    op = s.get('output_path', fallback='./feeds')
-    output_path = os.path.expanduser(op)
+def parse_feeds_from_environment():
+    '''
+    Get the environmental variables, and add any variables prefixed with "CHNFEED" to a dictionary
 
-    feed = CIFFeed(cif_host, cif_token, output_path, cif_verify_ssl)
-    feed.add_filters(s.items())
+    :returns: a dictionary with a key of the variable, and a value of it's value
+    '''
+    env = {}
+    for item in os.environ.items():
+        if item[0][0:7].upper() == "CHNFEED":
+            env[item[0].strip('"')] = item[1].strip('"')
+    logger.debug('Retrived env from environment: {}'.format(env))
 
+    config = get_feed_configs(env)
+    return config
+
+
+def feed_from_vars(fvars):
+    logger.debug('Building feed from vars: {}'.format(fvars))
+    try:
+        remote = fvars.pop('REMOTE')
+        token = fvars.pop('TOKEN')
+        filename = fvars.pop('FILENAME')
+    except KeyError as e:
+        logger.warning('Feed config missing required values: {}'.format(e))
+        return
+
+    if fvars.get('TLS_VERIFY'):
+        verify = fvars.pop('TLS_VERIFY')
+        if verify.lower() == 'true':
+            verify = True
+        else:
+            verify = False
+    else:
+        verify = False
+
+    if fvars.get('OUTPUT_PATH'):
+        output_path = fvars.pop('OUTPUT_PATH')
+    else:
+        output_path = './feeds'
+
+    feed = CIFFeed(remote=remote, token=token, output_path=output_path, verify=verify)
+    feed.filename = filename.strip('"')
+    logger.debug('Processing filters with remaining fvars: {}'.format(fvars))
+    feed.add_filters(fvars.items())
+
+    logger.debug('Parsed Feed: {}'.format(repr(feed)))
     return feed
 
 
-def parse_config(config_file):
-    cf = os.path.expanduser(config_file)
-    if not os.path.isfile(cf):
-        sys.exit("Could not find configuration file: {0}".format(cf))
-
-    parser = configparser.ConfigParser()
-    parser.read(cf)
-
-    config = {}
-
-    for section in parser.sections():
-        logger.info('Parsing section {}'.format(section))
-        feed = parse_section(parser[section])
-        config[section] = feed
-    logger.debug('Parsed config: {0}'.format(repr(config)))
-    return config
+def get_feed_configs(env):
+    configs = {}
+    for i in range(0, FEED_LIMIT):
+        prefix = 'CHNFEED' + str(i) + '_'
+        f = {}
+        for key in env:
+            if key[0:9] == prefix:
+                f[key[9:]] = env[key]
+        logger.debug('Collected set for f of: {}'.format(f))
+        if f:
+            feed = feed_from_vars(f)
+            if feed:
+                logger.debug('Adding feed: {}'.format(feed))
+                configs[feed.filename] = feed
+    return configs
 
 
 def write_feed(filepath, data):
@@ -88,7 +126,7 @@ def write_feed(filepath, data):
 def process_feeds(config):
     for feed in config:
         logger.info('Processing feed {}'.format(feed))
-        logger.debug('Feed: {}'.format(config[feed].__dict__))
+        logger.debug('Feed: {}'.format(repr(config[feed])))
 
         cf = config[feed]
         data = cf.get_feed()
@@ -100,8 +138,6 @@ def main():
     parser = argparse.ArgumentParser(
         description='Collect CIF feeds and write them out to a file, then refresh',
         epilog='http://xkcd.com/353/')
-    parser.add_argument('-C', '--config', dest='configfile', default='~/feed_generator.cfg',
-                        help='Feedparser Configuration file')
     parser.add_argument('-s', '--sleep', dest='sleep', type=int, default=60,
                         help='Number of minutes between feed refreshes; minimum 5, default 60')
     parser.add_argument('-r', '--refresh', action="store_true", dest='refresh',
@@ -115,7 +151,7 @@ def main():
     if opts.debug:
         logger.setLevel(logging.DEBUG)
 
-    config = parse_config(opts.configfile)
+    config = parse_feeds_from_environment()
 
     if opts.sleep < 5:
         logger.warning('Refresh delay set below minimum of 5 minutes; setting to 5 minutes')
