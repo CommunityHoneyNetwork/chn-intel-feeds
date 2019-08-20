@@ -1,2 +1,3 @@
 venv
-feed_generator.cfg
+intel.env
+docker-compose-testing.yml

@@ -15,4 +15,4 @@ cd /var/www/feeds
 python3 -m http.server ${PORT:-9000} &
 
 cd /var/www
-exec python3 /opt/feed_generator.py -C /opt/feed_generator.cfg -s ${SLEEP:-60} -r ${DBG}
+exec python3 /opt/feed_generator.py -s ${SLEEP:-60} -r ${DBG}
