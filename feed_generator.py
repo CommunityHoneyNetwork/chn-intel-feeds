@@ -19,6 +19,9 @@ logger.setLevel(logging.INFO)
 logger.addHandler(handler)
 
 
+class MissingRequirement(Exception):
+    pass
+
 class CIFFeed(object):
     def __init__(self, remote, token, output_path='./', verify=False):
         self.remote = remote
@@ -36,6 +39,10 @@ class CIFFeed(object):
         for item, value in items:
             if item.lower() in VALID_FILTERS:
                 filter[item.lower()] = value
+        if not filter.get('tags'):
+            logger.error('Feed does NOT specify a required filter for TAGS!')
+            raise MissingRequirement
+
         self.filters = filter
 
     def get_feed(self):
@@ -49,6 +56,7 @@ class CIFFeed(object):
             return f
         except Exception as e:
             logger.warning('Exception during get_feed: {}'.format(e))
+            logger.debug('CLI: {}, Filters: {}'.format(cli, self.filters))
             sys.exit(1)
 
 
@@ -92,14 +100,17 @@ def feed_from_vars(fvars):
     else:
         output_path = './feeds'
 
-    feed = CIFFeed(remote=remote, token=token, output_path=output_path, verify=verify)
-    feed.filename = filename.strip('"')
-    logger.debug('Processing filters with remaining fvars: {}'.format(fvars))
-    feed.add_filters(fvars.items())
+    try:
+        feed = CIFFeed(remote=remote, token=token, output_path=output_path, verify=verify)
+        feed.filename = filename.strip('"')
+        logger.debug('Processing filters with remaining fvars: {}'.format(fvars))
+        feed.add_filters(fvars.items())
 
-    logger.debug('Parsed Feed: {}'.format(repr(feed)))
-    return feed
-
+        logger.debug('Parsed Feed: {}'.format(repr(feed)))
+        return feed
+    except MissingRequirement as e:
+        logger.warning('Ignoring feed config: {}'.format(fvars))
+        return
 
 def get_feed_configs(env):
     configs = {}
@@ -152,6 +163,13 @@ def main():
         logger.setLevel(logging.DEBUG)
 
     config = parse_feeds_from_environment()
+    feed_count = len(config)
+    if not feed_count > 0:
+        logger.error('Found NO valid feeds specified. Please check the env file for valid specifications. Exiting in '
+                     '300 seconds')
+        time.sleep(300)
+        sys.exit(1)
+    logger.debug('After parsing we have {} valid feeds'.format(feed_count))
 
     if opts.sleep < 5:
         logger.warning('Refresh delay set below minimum of 5 minutes; setting to 5 minutes')
@@ -160,8 +178,7 @@ def main():
     seconds = opts.sleep * 60
     while True:
         process_feeds(config)
-        if not opts.refresh:
-            logger.info('Finished processing feeds, exiting.')
+        if not opts.refresh:            logger.info('Finished processing feeds, exiting.')
             sys.exit(0)
         logger.info('Finished processing feeds, sleeping for {} seconds'.format(seconds))
         time.sleep(seconds)
