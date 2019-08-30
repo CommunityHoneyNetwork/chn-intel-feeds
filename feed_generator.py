@@ -178,7 +178,8 @@ def main():
     seconds = opts.sleep * 60
     while True:
         process_feeds(config)
-        if not opts.refresh:            logger.info('Finished processing feeds, exiting.')
+        if not opts.refresh:
+            logger.info('Finished processing feeds, exiting.')
             sys.exit(0)
         logger.info('Finished processing feeds, sleeping for {} seconds'.format(seconds))
         time.sleep(seconds)
