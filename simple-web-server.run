@@ -11,5 +11,4 @@ then
 fi
 
 mkdir -p /var/www/feeds
-cd /var/www/feeds
-exec python3 -m http.server ${PORT:-9000}
+exec twistd -no web --path=/var/www/feeds --listen=tcp:9000
