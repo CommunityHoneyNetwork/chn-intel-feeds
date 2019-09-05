@@ -12,4 +12,4 @@ fi
 
 mkdir -p /var/www/feeds
 cd /var/www/feeds
-exec python3 -m http.server ${PORT:-9000} 2>&1 | /usr/bin/logger
+exec python3 -m http.server ${PORT:-9000}
