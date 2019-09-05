@@ -10,5 +10,5 @@ then
   DBG="-d"
 fi
 
-cd /var/www
-exec python3 /opt/feed_generator.py -s ${SLEEP:-60} -r ${DBG}
+mkdir -p /var/www/feeds
+exec twistd -no web --path=/var/www/feeds --listen=tcp:9000
