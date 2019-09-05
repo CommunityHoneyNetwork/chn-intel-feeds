@@ -9,6 +9,7 @@ LABEL description "Small App for reading from a CIF instance and generating stat
 LABEL authoritative-source-url "https://github.com/CommunityHoneyNetwork/hpfeeds-logger"
 LABEL changelog-url "https://github.com/CommunityHoneyNetwork/hpfeeds-logger/commits/master"
 
+RUN sed -i -e 's/archive.ubuntu.com/archive.linux.duke.edu/g' /etc/apt/sources.list
 RUN apt-get update \
     && apt-get upgrade -y
 RUN apt-get install -y python3 python3-pip runit build-essential python3-dev
