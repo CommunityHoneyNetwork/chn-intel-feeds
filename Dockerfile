@@ -21,4 +21,8 @@ RUN mkdir /etc/service/chn-intel-feeds && chmod 0755 /etc/service/chn-intel-feed
 COPY chn-intel-feeds.run /etc/service/chn-intel-feeds/run
 RUN chmod 0755 /etc/service/chn-intel-feeds/run
 
+RUN mkdir /etc/service/simple-web-server && chmod 0755 /etc/service/simple-web-server
+COPY simple-web-server.run /etc/service/simple-web-server/run
+RUN chmod 0755 /etc/service/simple-web-server/run
+
 ENTRYPOINT ["/usr/bin/runsvdir", "-P", "/etc/service"]

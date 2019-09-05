@@ -10,5 +10,6 @@ then
   DBG="-d"
 fi
 
-cd /var/www
-exec python3 /opt/feed_generator.py -s ${SLEEP:-60} -r ${DBG}
+mkdir -p /var/www/feeds
+cd /var/www/feeds
+exec python3 -m http.server ${PORT:-9000} 2>&1 | /usr/bin/logger
