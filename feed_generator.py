@@ -5,6 +5,7 @@ import sys
 import argparse
 import time
 from cifsdk.client.http import HTTP as Client
+from random import randint
 
 LOG_FORMAT = '%(asctime)s - %(levelname)s - %(name)s[%(lineno)s][%(threadName)s] - %(message)s'
 VALID_FILTERS = ['indicator', 'itype', 'confidence', 'provider', 'limit', 'application', 'nolog', 'tags', 'days',
@@ -57,6 +58,9 @@ class CIFFeed(object):
         except Exception as e:
             logger.warning('Exception during get_feed: {}'.format(e))
             logger.debug('CLI: {}, Filters: {}'.format(cli, self.filters))
+            backoff = randint(30, 120)
+            logger.warning('Backing off {} seconds after failure'.format(backoff))
+            time.sleep(backoff)
             sys.exit(1)
 
 
