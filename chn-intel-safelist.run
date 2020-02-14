@@ -10,6 +10,7 @@ then
   DBG="-d"
 fi
 
-mkdir -p /var/www/feeds
-cd /var/www
-exec python3 /opt/feed_generator.py -s ${SLEEP:-60} -r ${DBG}
+mkdir -p /var/www/safelists
+cd /var/www/safelists
+exec python3 /opt/feed_safelister.py -s ${SAFELIST_SLEEP:-60} -r ${DBG}
+
