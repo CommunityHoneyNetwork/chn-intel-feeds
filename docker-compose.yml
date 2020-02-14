@@ -1,9 +1,11 @@
-version: '2'
+version: '3'
 services:
   chn-intel-feeds:
     build:
       context: .
     image: chn-intel-feeds:ubuntu
+    volumes:
+      - ./safelists:/var/www/safelists
     ports:
       - 9000:9000
     env_file:

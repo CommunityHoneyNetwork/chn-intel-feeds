@@ -3,10 +3,10 @@ FROM ubuntu:18.04
 LABEL maintainer "Jesse Bowling <jessebowling@gmail.com>"
 LABEL name "chn-intel-feeds"
 LABEL version "1.8"
-LABEL release "1"
+LABEL release "2"
 LABEL summary "Community Honey Network intel feeds server"
 LABEL description "Small App for reading from a CIF instance and generating static feeds consumable via HTTP requests"
-LABEL authoritative-source-url "https://github.com/CommunityHoneyNetwork/hpfeeds-logger"
+LABEL authoritative-source-url "https://github.com/CommunityHoneyNetwork/chn-intel-feeds"
 LABEL changelog-url "https://github.com/CommunityHoneyNetwork/hpfeeds-logger/commits/master"
 
 RUN sed -i -e 's/archive.ubuntu.com/archive.linux.duke.edu/g' /etc/apt/sources.list
@@ -25,5 +25,10 @@ RUN chmod 0755 /etc/service/chn-intel-feeds/run
 RUN mkdir /etc/service/simple-web-server && chmod 0755 /etc/service/simple-web-server
 COPY simple-web-server.run /etc/service/simple-web-server/run
 RUN chmod 0755 /etc/service/simple-web-server/run
+
+RUN mkdir /etc/service/chn-intel-safelist && chmod 0755 /etc/service/chn-intel-safelist
+COPY chn-intel-safelist.run /etc/service/chn-intel-safelist/run
+RUN chmod 0755 /etc/service/chn-intel-safelist/run
+
 
 ENTRYPOINT ["/usr/bin/runsvdir", "-P", "/etc/service"]

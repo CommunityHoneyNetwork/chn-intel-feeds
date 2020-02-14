@@ -7,11 +7,11 @@ import time
 from cifsdk.client.http import HTTP as Client
 from random import randint
 
-LOG_FORMAT = '%(asctime)s - %(levelname)s - %(name)s[%(lineno)s][%(threadName)s] - %(message)s'
+LOG_FORMAT = '%(asctime)s - %(levelname)s - %(name)s[%(lineno)s][%(filename)s] - %(message)s'
 VALID_FILTERS = ['indicator', 'itype', 'confidence', 'provider', 'limit', 'application', 'nolog', 'tags', 'days',
                  'hours', 'groups', 'reporttime', 'cc', 'asn', 'asn_desc', 'rdata', 'firsttime', 'lasttime', 'region',
                  'id']
-FEED_LIMIT = 30
+FEED_LIMIT = 10
 
 handler = logging.StreamHandler()
 handler.setFormatter(logging.Formatter(LOG_FORMAT))
