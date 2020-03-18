@@ -3,7 +3,7 @@ services:
   chn-intel-feeds:
     build:
       context: .
-    image: chn-intel-feeds:ubuntu
+    image: chn-intel-feeds:latest
     volumes:
       - ./safelists:/var/www/safelists
     ports:
