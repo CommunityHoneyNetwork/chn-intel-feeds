@@ -99,6 +99,8 @@ class CIFFeed(object):
         logger.debug('Testing candidate for IPv4-ness: {}'.format(candidate))
         if validators.ip_address.ipv4(candidate):
             return True
+        elif validators.ipv4_cidr(candidate):
+            return True
         else:
             return False
 
