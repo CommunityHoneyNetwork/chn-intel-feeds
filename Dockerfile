@@ -9,6 +9,9 @@ LABEL description "Small App for reading from a CIF instance and generating stat
 LABEL authoritative-source-url "https://github.com/CommunityHoneyNetwork/chn-intel-feeds"
 LABEL changelog-url "https://github.com/CommunityHoneyNetwork/hpfeeds-logger/commits/master"
 
+# hadolint ignore=DL3008,DL3005
+ENV DEBIAN_FRONTEND "noninteractive"
+
 RUN sed -i -e 's/archive.ubuntu.com/archive.linux.duke.edu/g' /etc/apt/sources.list
 RUN apt-get update \
     && apt-get upgrade -y
