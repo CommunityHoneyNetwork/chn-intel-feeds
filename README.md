@@ -9,6 +9,4 @@ All configuration lives in the `.env` file which is imported via the docker-comp
 
 Find the documentation here: [https://communityhoneynetwork.readthedocs.io](https://communityhoneynetwork.readthedocs.io)
 
-| branch | build status |
-| ---    | ---          |
-| master | [![master status](https://gitlab.oit.duke.edu/stingar/chn-intel-feeds/badges/master/pipeline.svg)](https://gitlab.oit.duke.edu/stingar/chn-intel-feeds/commits/master)|
+![CI](https://github.com/CommunityHoneyNetwork/chn-intel-feeds/workflows/CI/badge.svg)
