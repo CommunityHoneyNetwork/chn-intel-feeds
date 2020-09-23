@@ -10,7 +10,13 @@ then
   DBG="-d"
 fi
 
-mkdir -p /var/www/safelists
-cd /var/www/safelists
-exec python3 /opt/feed_safelister.py -s ${SAFELIST_SLEEP:-60} -r ${DBG}
-
+if [[ ${CIF_SAFELIST_ENABLED} == "true" ]]
+then
+  mkdir -p /var/www/safelists
+  cd /var/www/safelists
+  exec python3 /opt/cif_feed_safelister.py -s ${SAFELIST_SLEEP:-60} -r ${DBG}
+else
+  echo "CIF_SAFELIST_ENABLED not \"true\". Disabling CIF safelist upload."
+  sleep 300
+  exit 0
+fi
