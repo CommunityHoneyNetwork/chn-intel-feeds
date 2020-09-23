@@ -10,13 +10,13 @@ then
   DBG="-d"
 fi
 
-if [[ ${CIF_FEED_ENABLED} == "true" ]]
+if [[ ${CHN_FEED_ENABLED} == "true" ]]
 then
   mkdir -p /var/www/feeds
   cd /var/www
-  exec python3 /opt/cif_feed_generator.py -s ${SLEEP:-60} -r ${DBG}
+  exec python3 /opt/chn_feed_generator.py -s ${SLEEP:-60} -r ${DBG}
 else
-  echo "CIF_FEED_ENABLED not \"true\". Disabling CIF feed generation."
+  echo "CHN_FEED_ENABLED not \"true\". Disabling CIF feed generation."
   sleep 300
   exit 0
 fi

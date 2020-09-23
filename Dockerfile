@@ -35,5 +35,8 @@ RUN mkdir /etc/service/chn-intel-safelist && chmod 0755 /etc/service/chn-intel-s
 COPY chn-intel-safelist.run /etc/service/chn-intel-safelist/run
 RUN chmod 0755 /etc/service/chn-intel-safelist/run
 
+RUN mkdir /etc/service/chn-api-feeds && chmod 0755 /etc/service/chn-api-feeds
+COPY chn-api-feeds.run /etc/service/chn-api-feeds/run
+RUN chmod 0755 /etc/service/chn-api-feeds/run
 
 ENTRYPOINT ["/usr/bin/runsvdir", "-P", "/etc/service"]
