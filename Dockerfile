@@ -1,13 +1,13 @@
 FROM ubuntu:18.04
 
-LABEL maintainer "Jesse Bowling <jessebowling@gmail.com>"
-LABEL name "chn-intel-feeds"
-LABEL version "1.9"
-LABEL release "2"
-LABEL summary "Community Honey Network intel feeds server"
-LABEL description "Small App for reading from a CIF instance and generating static feeds consumable via HTTP requests"
-LABEL authoritative-source-url "https://github.com/CommunityHoneyNetwork/chn-intel-feeds"
-LABEL changelog-url "https://github.com/CommunityHoneyNetwork/hpfeeds-logger/commits/master"
+LABEL maintainer="Team Stingar <team-stingar@duke.edu>"
+LABEL name="chn-intel-feeds"
+LABEL version="1.9.1"
+LABEL release="1"
+LABEL summary="Community Honey Network intel feeds server"
+LABEL description="Small App for reading from a CIF instance and generating static feeds consumable via HTTP requests"
+LABEL authoritative-source-url="https://github.com/CommunityHoneyNetwork/chn-intel-feeds"
+LABEL changelog-url="https://github.com/CommunityHoneyNetwork/hpfeeds-logger/commits/master"
 
 ENV DEBIAN_FRONTEND "noninteractive"
 
