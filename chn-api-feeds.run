@@ -16,7 +16,7 @@ then
   cd /var/www
   exec python3 /opt/chn_feed_generator.py -s ${SLEEP:-60} -r ${DBG}
 else
-  echo "CHN_FEED_ENABLED not \"true\". Disabling CIF feed generation."
+  echo "CHN_FEED_ENABLED not \"true\". Disabling CHN API feed generation."
   sleep 300
   exit 0
 fi
